@@ -1,39 +1,36 @@
-import { useState } from 'react';
-import { loadDetectionModel } from '../utils/load-detection-model';
-import { estimateFacesLoop } from '../utils/estimateFacesLoop';
-import { FaceLandmarksDetector } from '@tensorflow-models/face-landmarks-detection';
 import Webcam from 'react-webcam';
+import { handleStartPenaltyFilter } from '../utils/startFilter';
 
-function TestPenaltyButton(
-    buttonText:string,
-    filterPath:string,
-    canvas:CanvasRenderingContext2D,
-    webcamRef:React.RefObject<Webcam>,
-    videoSize:{ width: number; height: number },
-) {
+// Props 타입 정의
+type TestPenaltyButtonProps = {
+    buttonText: string;
+    filterPath: string;
+    canvas: CanvasRenderingContext2D;
+    webcamRef: React.RefObject<Webcam>;
+    videoSize: { width: number; height: number };
+    filterType:string;
+};
 
-    const [status, setStatus] = useState<'Initializing...' | 'Load Model...' | 'Model Loaded'>('Initializing...');
+function TestPenaltyButton({
+    buttonText,
+    filterPath,
+    filterType,
+}: TestPenaltyButtonProps) {
 
     const setFilter = () => {
-
         const image = new Image();
         image.src = filterPath;
 
-        setStatus('Load Model...');
+        console.log('SET FILTER');
 
-        loadDetectionModel().then((model: FaceLandmarksDetector) => {
-            setStatus('Model Loaded');
-            requestAnimationFrame(() =>
-                estimateFacesLoop(model, image, canvas, webcamRef, videoSize),
-            );
-        });
+        handleStartPenaltyFilter({ image,filterType });
     };
-
-
 
     return (
         <>
-            <button id = "penaltyTestButton" onClick={() => setFilter()}>{buttonText}</button>
+            <button id="penaltyTestButton" onClick={() => setFilter()}>
+                {buttonText}
+            </button>
         </>
     );
 }
